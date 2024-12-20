@@ -71,8 +71,12 @@ services:
     container_name: polybot
     environment:
       TELEGRAM_TOKEN: 7906147666:AAFpBiz1j5bGLNFXG1x54mOHaqTHngrokHP0gRQU
-      TELEGRAM_APP_URL: https://web.telegram.org/a/#7906147666
+      TELEGRAM_APP_URL: https://classic-ghost-needlessly.ngrok-free.app
       BUCKET_NAME: ofekh-polybotservicedocker-project
+    image: ofekhalabi/polybot:1.0.0
+    networks:
+      - mongo-replica-set
+
 
 
 networks:

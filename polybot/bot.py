@@ -144,8 +144,9 @@ class ObjectDetectionBot(Bot):
             except Exception as e:
                 logger.error(f"Error uploading file: {e}")
                 return f"Error uploading file: {e}", 500
-            # TODO send an HTTP request to the `yolo5` service for prediction
 
+
+            # TODO send an HTTP request to the `yolo5` service for prediction
             url = "http://localhost:8081/predict"
             params = {"imgName": s3_image_key_upload}
 
@@ -154,3 +155,5 @@ class ObjectDetectionBot(Bot):
             print("Status Code:", response.status_code)
             print("Response Text:", response.text)
             # TODO send the returned results to the Telegram end-user
+            chat_id = msg['chat']['id']
+            self.send_text(chat_id, f'Detected objects:\n {response.text}')
