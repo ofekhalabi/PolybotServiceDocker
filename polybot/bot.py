@@ -3,6 +3,10 @@ from loguru import logger
 import os
 import time
 from telebot.types import InputFile
+from polybot.img_proc import Img
+import boto3
+from botocore.exceptions import NoCredentialsError
+import requests
 
 
 class Bot:
@@ -65,6 +69,55 @@ class Bot:
         self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
 
 
+class ImageProcessingBot(Bot):
+    def handle_message(self, msg):
+        try:
+            logger.info(f'Incoming message: {msg}')
+            chat_id = msg['chat']['id']
+            caption = msg.get('caption', None)  # Get the caption from the message
+            if self.is_current_msg_photo(msg):
+                photo_path = self.download_user_photo(msg)
+
+                if caption:
+                    caption = caption.lower()
+                    # Check if the caption matches any of the defined commands
+                    if caption in ['blur', 'contour', 'rotate', 'segment', 'salt and pepper', 'concat', 'rotate 2']:
+                        processed_image_path = self.process_image(photo_path, caption)
+                        self.send_photo(chat_id,processed_image_path)
+
+                    else:
+                        self.send_text(chat_id, f'Unknown command: {caption}')
+                else:
+                    self.send_text(chat_id, 'Photo received with no caption.')
+            else:
+                self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
+        except Exception as e:
+            logger.error(f"Error processing image: {e}")
+            self.send_text(msg['chat']['id'], "There was an error processing the image.")
+
+
+    def process_image(self, photo_path, command):
+        try:
+            img = Img(photo_path)  # Assuming Img is your image processing class
+            if command == 'blur':
+                img.blur()
+            elif command == 'contour':
+                img.contour()
+            elif command == 'rotate':
+                img.rotate()
+            elif command == 'segment':
+                img.segment()
+            elif command == 'salt and pepper':
+                img.salt_n_pepper()
+            elif command == 'concat':
+                img.concat(img)
+            elif command == 'rotate 2':
+                img.rotate()
+                img.rotate()
+            return img.save_img()
+        except Exception as e:
+            logger.error(f'Error processing image: {e}')
+
 class ObjectDetectionBot(Bot):
     def handle_message(self, msg):
         logger.info(f'Incoming message: {msg}')
@@ -73,5 +126,31 @@ class ObjectDetectionBot(Bot):
             photo_path = self.download_user_photo(msg)
 
             # TODO upload the photo to S3
+            # upload the image to S3 Bucket ofekh-polybotservicedocker-project
+            s3 = boto3.client('s3')
+            bucket_name = os.getenv('BUCKET_NAME')
+            s3_image_key_upload = f'telegramBOT/picture.jpg'
+
+            try:
+                # Upload predicted image back to S3
+                s3.upload_file(str(photo_path), bucket_name, s3_image_key_upload)
+                logger.info(f"File uploaded successfully to {bucket_name}/{s3_image_key_upload}")
+            except FileNotFoundError:
+                logger.error("The file was not found.")
+                return "Predicted image not found", 404
+            except NoCredentialsError:
+                logger.error("AWS credentials not available.")
+                return "AWS credentials not available", 403
+            except Exception as e:
+                logger.error(f"Error uploading file: {e}")
+                return f"Error uploading file: {e}", 500
             # TODO send an HTTP request to the `yolo5` service for prediction
+
+            url = "http://localhost:8081/predict"
+            params = {"imgName": s3_image_key_upload}
+
+            response = requests.post(url, params=params)
+            # Print the response from the server
+            print("Status Code:", response.status_code)
+            print("Response Text:", response.text)
             # TODO send the returned results to the Telegram end-user
