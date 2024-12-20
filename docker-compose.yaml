@@ -73,11 +73,13 @@ services:
       TELEGRAM_TOKEN: 7906147666:AAFpBiz1j5bGLNFXG1x54mOHaqTHngrokHP0gRQU
       TELEGRAM_APP_URL: https://classic-ghost-needlessly.ngrok-free.app
       BUCKET_NAME: ofekh-polybotservicedocker-project
-    image: ofekhalabi/polybot:1.0.0
+    image: ofekhalabi/polybot:1.0.1
+    ports:
+      - "8443:8443"
     networks:
       - mongo-replica-set
-
-
+    depends_on:
+      - yolo5
 
 networks:
   mongo-replica-set:
