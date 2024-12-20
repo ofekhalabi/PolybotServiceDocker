@@ -28,8 +28,7 @@ def predict():
     # Receives a URL parameter representing the image to download from S3
     img_name = request.args.get('imgName')
 
-    # TODO download img_name from S3, store the local image path in the original_img_path variable.
-    #  The bucket name is provided as an env var BUCKET_NAME.
+
     # Initialize the S3 client
     s3 = boto3.client('s3')
     original_img_path = f'/tmp/{img_name}'  # Temporary storage for downloaded image
@@ -57,7 +56,6 @@ def predict():
     # The predicted image typically includes bounding boxes drawn around the detected objects, along with class labels and possibly confidence scores.
     predicted_img_path = f'static/data/{prediction_id}/{img_name}'
 
-    # TODO Uploads the predicted image (predicted_img_path) to S3 (be careful not to override the original image).
     # Specify the local file and S3 bucket details
     s3_image_key_upload = f'predictions/{prediction_id}_{img_name}'
 
@@ -99,7 +97,6 @@ def predict():
             'time': time.time()
         }
 
-        # TODO store the prediction_summary in MongoDB
         # Connect to MongoDB
         client = MongoClient('mongodb://MongoDBPrimary:27017,MongoDBSec1:27018,MongoDBSec2:27019/?replicaSet=myReplicaSet')
 
