@@ -65,8 +65,56 @@ class Bot:
     def handle_message(self, msg):
         """Bot Main message handler"""
         logger.info(f'Incoming message: {msg}')
-        self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
+        if 'text' in msg:
+            self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
+        elif self.is_current_msg_photo(msg):
+            self.handle_photo_message(msg)
+        else:
+            self.send_text(msg['chat']['id'], "Unsupported message type")
 
+    def handle_photo_message(self, msg):
+        chat_id = msg['chat']['id']
+        photo_path = self.download_user_photo(msg)
+        # upload the image to S3 Bucket ofekh-polybotservicedocker-project
+        s3 = boto3.client('s3')
+        bucket_name = os.getenv('BUCKET_NAME')
+        s3_image_key_upload = f'{chat_id}_teleBOT_picture.jpg'
+
+        try:
+            # Upload predicted image back to S3
+            s3.upload_file(str(photo_path), bucket_name, s3_image_key_upload)
+            logger.info(f"File uploaded successfully to {bucket_name}/{s3_image_key_upload}")
+        except FileNotFoundError:
+            logger.error("The file was not found.")
+            return "Predicted image not found", 404
+        except NoCredentialsError:
+            logger.error("AWS credentials not available.")
+            return "AWS credentials not available", 403
+        except Exception as e:
+            logger.error(f"Error uploading file: {e}")
+            return f"Error uploading file: {e}", 500
+
+        # send an HTTP request to the `yolo5` service for prediction
+        url = "http://yolo5:8081/predict"
+        params = {"imgName": s3_image_key_upload}
+
+        response = requests.post(url, params=params)
+
+        response_data = response.json()
+        # Format the detected objects
+        labels = response_data.get('labels', [])
+        label_counts = {}
+        for label in labels:
+            label_class = label['class']
+            if label_class in label_counts:
+                label_counts[label_class] += 1
+            else:
+                label_counts[label_class] = 1
+
+        formatted_result = '\n'.join([f'{label}: {count}' for label, count in label_counts.items()])
+
+        # send the returned results to the Telegram end-user
+        self.send_text(chat_id, f'Detected objects:\n {formatted_result}')
 
 
 class ObjectDetectionBot(Bot):
@@ -74,37 +122,4 @@ class ObjectDetectionBot(Bot):
         logger.info(f'Incoming message: {msg}')
 
         if self.is_current_msg_photo(msg):
-            photo_path = self.download_user_photo(msg)
-
-            # upload the image to S3 Bucket ofekh-polybotservicedocker-project
-            s3 = boto3.client('s3')
-            bucket_name = os.getenv('BUCKET_NAME')
-            s3_image_key_upload = f'telegramBOT/picture.jpg'
-
-            try:
-                # Upload predicted image back to S3
-                s3.upload_file(str(photo_path), bucket_name, s3_image_key_upload)
-                logger.info(f"File uploaded successfully to {bucket_name}/{s3_image_key_upload}")
-            except FileNotFoundError:
-                logger.error("The file was not found.")
-                return "Predicted image not found", 404
-            except NoCredentialsError:
-                logger.error("AWS credentials not available.")
-                return "AWS credentials not available", 403
-            except Exception as e:
-                logger.error(f"Error uploading file: {e}")
-                return f"Error uploading file: {e}", 500
-
-
-            # send an HTTP request to the `yolo5` service for prediction
-            url = "http://localhost:8081/predict"
-            params = {"imgName": s3_image_key_upload}
-
-            response = requests.post(url, params=params)
-            # Print the response from the server
-            print("Status Code:", response.status_code)
-            print("Response Text:", response.text)
-
-            # send the returned results to the Telegram end-user
-            chat_id = msg['chat']['id']
-            self.send_text(chat_id, f'Detected objects:\n {response.text}')
+            self.handle_photo_message(msg)

@@ -54,12 +54,10 @@ services:
   yolo5:
     container_name: yolo5
     environment:
-      BUCKET_NAME: ofekh-polybotservicedocker-project
-    image: ofekhalabi/yolo5:2.0.3
+      BUCKET_NAME: ${BUCKET_NAME}
+    image: ${YOLO5_IMG_NAME}
     ports:
       - "8081:8081"
-    volumes:
-      - $HOME/.aws/credentials:/root/.aws/credentials
     networks:
       - mongo-replica-set
     depends_on:
@@ -70,10 +68,10 @@ services:
   polybot:
     container_name: polybot
     environment:
-      TELEGRAM_TOKEN: 7906147666:AAFpBiz1j5bGLNFXG1x54mOHaqTHngrokHP0gRQU
-      TELEGRAM_APP_URL: https://classic-ghost-needlessly.ngrok-free.app
-      BUCKET_NAME: ofekh-polybotservicedocker-project
-    image: ofekhalabi/polybot:1.0.6
+      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
+      TELEGRAM_APP_URL:  ${TELEGRAM_APP_URL}
+      BUCKET_NAME: ${BUCKET_NAME}
+    image: ${POLYBOT_IMG_NAME}
     ports:
       - "8443:8443"
     networks:
