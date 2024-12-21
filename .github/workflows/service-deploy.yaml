@@ -99,6 +99,9 @@ jobs:
             
             # Take the service down
             docker compose down
+             
+            # Remove any existing containers with the same name
+            docker rm -f MongoDBSec1 MongoDBPrimary MongoDBSec2 || true
             
             # Take it up with the current updated values
             docker compose up -d
