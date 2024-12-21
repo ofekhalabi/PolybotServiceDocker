@@ -82,6 +82,9 @@ jobs:
             
             sudo apt update && sudo apt install jq -y
             
+            # Login to DockerHub (comment out if you don't use DockerHub):         
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            
             cd PolybotService/
             
             # Save telegram bot token in a secret file, to be used in docker-compose.yaml
