@@ -57,7 +57,7 @@ def predict():
     predicted_img_path = f'static/data/{prediction_id}/{img_name}'
 
     # Specify the local file and S3 bucket details
-    s3_image_key_upload = f'predictions/{prediction_id}_{img_name}'
+    s3_image_key_upload = f'predictions/picture.jpg'
 
     try:
         # Upload predicted image back to S3

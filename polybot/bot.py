@@ -97,10 +97,20 @@ class Bot:
         # send an HTTP request to the `yolo5` service for prediction
         url = "http://yolo5:8081/predict"
         params = {"imgName": s3_image_key_upload}
-
         response = requests.post(url, params=params)
-
         response_data = response.json()
+
+        s3_image_key_download = f'predictions/picture.jpg'
+        original_img_path = f'/tmp/image.jpg'  # Temporary storage for downloaded image
+        try:
+            # Download the file from S3
+            s3.download_file(bucket_name, s3_image_key_download, original_img_path)
+            logger.info(f'Downloaded prediction image completed')
+        except Exception as e:
+            logger.error(f'Error downloading {s3_image_key_download}: {e}')
+        # send photo results to the Telegram end-user
+        self.send_photo(chat_id, original_img_path)
+
         # Format the detected objects
         labels = response_data.get('labels', [])
         label_counts = {}
