@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  EC2_PUBLIC_IP: X.X.X.X  # TODO replace to your EC2 instance public IP
+  EC2_PUBLIC_IP: 13.61.144.97 # TODO replace to your EC2 instance public IP
 
 jobs:
   PolybotBuild:
@@ -20,14 +20,14 @@ jobs:
           cd polybot
           
           # Login to ECR (commend in in case you use ECR, change region code and ECR URI):
-          # export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          # export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 352708296901.dkr.ecr.eu-central-1.amazonaws.com
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 352708296901.dkr.ecr.eu-central-1.amazonaws.com
           
           # Login to DockerHub (comment out if you don't use DockerHub):         
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
 
-          IMAGE_NAME=polybot:${{ github.run_number }}
+          IMAGE_NAME=ofekhalabi/polybot:${{ github.run_number }}
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
@@ -41,13 +41,13 @@ jobs:
         run: |
           cd yolo5
           
-          # export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          # export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 352708296901.dkr.ecr.eu-central-1.amazonaws.com
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 352708296901.dkr.ecr.eu-central-1.amazonaws.com
                
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
 
-          IMAGE_NAME=yolo5:${{ github.run_number }}
+          IMAGE_NAME=ofekhalabi/yolo5:${{ github.run_number }}
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
