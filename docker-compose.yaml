@@ -79,6 +79,7 @@ services:
     depends_on:
       - yolo5
 
+
 networks:
   mongo-replica-set:
     driver: bridge
