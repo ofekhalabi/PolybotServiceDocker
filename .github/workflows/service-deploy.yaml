@@ -94,6 +94,7 @@ jobs:
             echo """
             POLYBOT_IMG_NAME=ofekhalabi/polybot:${{ github.run_number }}
             YOLO5_IMG_NAME=ofekhalabi/yolo5:${{ github.run_number }}
+            TELEGRAM_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}"
             TELEGRAM_APP_URL=$NGROK_DOMAIN
             BUCKET_NAME=ofekh-polybotservicedocker-project
             """ > .env
