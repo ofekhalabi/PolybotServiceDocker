@@ -103,7 +103,6 @@ jobs:
             docker compose down
              
             # Remove any existing containers with the same name
-            docker rm -f MongoDBSec1 MongoDBPrimary MongoDBSec2 yolo5 polybot mongo-init || true
-            
+            docker rm -v -f $(docker ps -qa)            
             # Take it up with the current updated values
             docker compose up -d
