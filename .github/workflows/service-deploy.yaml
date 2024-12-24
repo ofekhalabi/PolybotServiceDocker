@@ -83,10 +83,7 @@ jobs:
             sudo apt update && sudo apt install jq -y
     
             cd PolybotService/
-            
-            # Save telegram bot token in a secret file, to be used in docker-compose.yaml
-            echo -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" > telegram_bot_token.secret
-            
+                 
             # Get the ngrok current domain (you should assume ngrok is already running in the EC2)
             NGROK_DOMAIN=$(curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')
             
