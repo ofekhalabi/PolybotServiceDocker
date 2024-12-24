@@ -6,5 +6,4 @@ RUN pip install -r requirements.txt
 RUN curl -L https://github.com/ultralytics/yolov5/releases/download/v6.2/yolov5s.pt -o yolov5s.pt
 
 COPY . .
-RUN mkdir $HOME/.aws/
 CMD ["python3", "app.py"]
