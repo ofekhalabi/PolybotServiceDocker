@@ -95,6 +95,7 @@ jobs:
             POLYBOT_IMG_NAME=ofekhalabi/polybot:${{ github.run_number }}
             YOLO5_IMG_NAME=ofekhalabi/yolo5:${{ github.run_number }}
             TELEGRAM_APP_URL=$NGROK_DOMAIN
+            BUCKET_NAME=ofekh-polybotservicedocker-project
             """ > .env
             
             # Take the service down
