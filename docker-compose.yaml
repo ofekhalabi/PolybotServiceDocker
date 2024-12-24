@@ -68,9 +68,10 @@ services:
   polybot:
     container_name: polybot
     environment:
-      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
       TELEGRAM_APP_URL:  ${TELEGRAM_APP_URL}
       BUCKET_NAME: ${BUCKET_NAME}
+    env_file:
+      - telegram_bot_token.secret
     image: ${POLYBOT_IMG_NAME}
     ports:
       - "8443:8443"
