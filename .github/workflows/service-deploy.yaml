@@ -5,6 +5,7 @@ on:
     branches:
       - main
 
+
 env:
   EC2_PUBLIC_IP: 51.21.135.217
 
