@@ -10,8 +10,6 @@ services:
     command: mongod --replSet myReplicaSet --bind_ip localhost,MongoDBPrimary
 
 
-
-
   MongoDBSec1:
     container_name: MongoDBSec1
     image: mongo:5
