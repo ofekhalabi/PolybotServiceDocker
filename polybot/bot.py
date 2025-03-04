@@ -7,11 +7,6 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 import requests
 
-try:
-    POLYBOT_CERTIFICATE = os.environ['POLYBOT_CERTIFICATE']
-except KeyError as e:
-    raise RuntimeError(f"Missing required environment variable: {e}")
-
 class Bot:
 
     def __init__(self, token, telegram_chat_url):
@@ -24,8 +19,7 @@ class Bot:
         time.sleep(0.5)
 
         # set the webhook URL
-        #self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
-        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', certificate=POLYBOT_CERTIFICATE)
+        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
 
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
 
