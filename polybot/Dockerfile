@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.13.3-slim
 WORKDIR /usr/src/app
 RUN pip install --upgrade pip
 COPY requirements.txt .
